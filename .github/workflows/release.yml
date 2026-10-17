@@ -47,11 +47,23 @@ jobs:
         run: >
           dotnet pack wpf-design-guard.sln -c Release
           -p:PackageOutputPath=${{ github.workspace }}/artifacts/nupkg
+      - name: NuGet login (trusted publishing)
+        id: nuget_login
+        uses: NuGet/login@v1
+        continue-on-error: true
+        with:
+          user: zhaojie-tech
+      - name: Publish to nuget.org (trusted publishing)
+        if: steps.nuget_login.outcome == 'success'
+        run: >
+          dotnet nuget push "artifacts/nupkg/*.nupkg"
+          --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json --skip-duplicate
       - name: Note when NuGet publishing is not configured
-        if: env.NUGET_API_KEY == ''
-        run: echo "::notice::NUGET_API_KEY is not configured — skipping nuget.org publish; packages are attached to the GitHub Release."
-      - name: Publish to nuget.org
-        if: env.NUGET_API_KEY != ''
+        if: steps.nuget_login.outcome != 'success' && env.NUGET_API_KEY == ''
+        run: echo "::notice::Trusted publishing is not configured and NUGET_API_KEY is unset — skipping nuget.org publish; packages are attached to the GitHub Release."
+      - name: Publish to nuget.org (API key fallback)
+        if: steps.nuget_login.outcome != 'success' && env.NUGET_API_KEY != ''
         run: >
           dotnet nuget push "artifacts/nupkg/*.nupkg"
           --api-key "$NUGET_API_KEY"
