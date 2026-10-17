@@ -4,6 +4,13 @@ All notable changes are documented here. Diagnostic IDs and message texts are pu
 API: adding a rule = minor; removing a rule or changing a default severity = major;
 message text changes are recorded in this file.
 
+## [0.2.2] — 2026-10-17
+
+### Tooling
+
+- NuGet publishing now uses Trusted Publishing (OIDC) in the release workflow,
+  with the API key kept as a fallback. No functional changes.
+
 ## [0.2.1] — 2026-10-17
 
 ### Fixed
