@@ -4,6 +4,14 @@ All notable changes are documented here. Diagnostic IDs and message texts are pu
 API: adding a rule = minor; removing a rule or changing a default severity = major;
 message text changes are recorded in this file.
 
+## [0.2.1] — 2026-10-17
+
+### Fixed
+
+- CLI package ID is `WpfDesignGuard.Cli` (not the internal assembly name
+  `designguard`), matching the documented install command. The tool command
+  remains `designguard`. Supersedes the CLI asset in the v0.2.0 dry-run release.
+
 ## [0.2.0] — 2026-10-17
 
 ### Rules shipped (all 17 allocated IDs now implemented)

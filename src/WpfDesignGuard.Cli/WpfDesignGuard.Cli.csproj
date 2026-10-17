@@ -7,6 +7,7 @@
     <RootNamespace>WpfDesignGuard.Cli</RootNamespace>
     <AssemblyName>designguard</AssemblyName>
     <PackAsTool>true</PackAsTool>
+    <PackageId>WpfDesignGuard.Cli</PackageId>
     <ToolCommandName>designguard</ToolCommandName>
     <PackageOutputPath>../../artifacts/nupkg</PackageOutputPath>
     <RollForward>Major</RollForward>
