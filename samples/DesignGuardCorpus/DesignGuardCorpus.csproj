@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <!-- Corpus project (DESIGN §8/§10): one project hosting every rule's positive and
+         negative example XAML, kept plain-SDK so the corpus builds (and self-bootstraps)
+         on any OS. A dedicated WPF compile check runs in the windows CI job. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/WpfDesignGuard.Analyzers/WpfDesignGuard.Analyzers.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../src/WpfDesignGuard.Core/WpfDesignGuard.Core.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="Xaml/**/*.xaml" />
+  </ItemGroup>
+
+  <Import Project="../../src/WpfDesignGuard.Analyzers/build/WpfDesignGuard.Analyzers.targets" />
+
+</Project>

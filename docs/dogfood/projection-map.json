@@ -1,0 +1,26 @@
+{
+  "$comment": "Dogfood projection map — example shape for `designguard` cross-checking workflows. Each entry binds one tool rule to an external judgement source (a legacy test gate, a lint script, a manual checklist) so counts can be reconciled before the legacy gate is retired. Anchors pointing at private repositories stay private; this file documents the schema and a minimal seed for the rules implemented in v0.1.",
+  "schema": {
+    "entries": [
+      {
+        "toolRule": "DG0002",
+        "externalGate": {
+          "judgement": "Multi-component Margin/Padding literal with any component not in the spacing ladder [0,2,4,8,12,16,24,32]. Scan forms: attribute, property element, Setter Value. Comments stripped before scanning.",
+          "sourceAnchor": "file+line of the legacy assertion (fill in per repository)"
+        },
+        "projection": "Count hits with the tool rule after projecting the legacy scan surface onto the tool config scope; the projected count must equal the legacy count. Generalization deltas (e.g. extra scan forms the legacy regex missed) go to a delta list with individual dispositions."
+      },
+      {
+        "toolRule": "DG0007",
+        "externalGate": {
+          "judgement": "TextBlock with TextWrapping=\"Wrap\" missing LineHeight or LineStackingStrategy. WrapWithOverflow intentionally out of scope.",
+          "sourceAnchor": "file+line of the legacy assertion (fill in per repository)"
+        },
+        "projection": "Same as DG0002."
+      }
+    ],
+    "deltaDisposition": {
+      "$comment": "Every projection-vs-legacy delta gets exactly one of: fixed (tool narrowed), exempted (registered in designguard.json), or issue-tracked (with link). Clearing to zero is NOT the acceptance criterion; the dispositions ledger is."
+    }
+  }
+}

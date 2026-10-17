@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- M1 first-day spike (DESIGN §11): proves the AdditionalFiles -> generator ->
+         diagnostic pipeline end to end on a plain SDK project. WPF @(Page) items are
+         defined by hand here — the real WPF build defines them identically. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/WpfDesignGuard.Analyzers/WpfDesignGuard.Analyzers.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../src/WpfDesignGuard.Core/WpfDesignGuard.Core.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- Page items stand in for what a real WPF project produces; designguard.json and the
+       FullPath projection are injected by the package targets themselves (the exact path a
+       real consumer takes). -->
+  <ItemGroup>
+    <Page Include="Ui/SamplePage.xaml" />
+    <Page Include="Ui/Spike2.xaml" />
+  </ItemGroup>
+
+  <Import Project="../../src/WpfDesignGuard.Analyzers/build/WpfDesignGuard.Analyzers.targets" />
+
+</Project>

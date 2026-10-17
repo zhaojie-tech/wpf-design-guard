@@ -1,0 +1,10 @@
+{
+  // Spike config: default token table, one baseline entry so the corpus stays warning-level
+  // (cold-start downgrade demo: 1 hit <= snapshot 1).
+  "version": 1,
+  "baseline": {
+    "date": "2026-10-15",
+    "counts": { "DG0002": 1, "DG0007": 1 },
+    "files": { "Ui/Spike2.xaml": { "DG0002": 1, "DG0007": 1 } }
+  }
+}

@@ -1,0 +1,6 @@
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <!-- In the baseline per-file snapshot: same hits must downgrade to warnings (cold start). -->
+  <Grid Margin="8,6">
+    <TextBlock TextWrapping="Wrap" Text="legacy" />
+  </Grid>
+</Page>

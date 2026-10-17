@@ -1,0 +1,43 @@
+name: docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'mkdocs.yml', 'tools/RuleDocGen/**', 'src/WpfDesignGuard.Core/Rules/**']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install mkdocs-material
+      - name: Regenerate rule pages and gate against drift
+        run: |
+          dotnet run --project tools/RuleDocGen -c Release
+          git add -A -- docs/rules
+          git diff --cached --exit-code -- 'docs/rules/DG*.md'
+      - run: mkdocs build --strict
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

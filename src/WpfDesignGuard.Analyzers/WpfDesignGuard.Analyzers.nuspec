@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>WpfDesignGuard.Analyzers</id>
+    <version>$version$</version>
+    <authors>WpfDesignGuard contributors</authors>
+    <license type="expression">MIT</license>
+    <readme>docs/README.md</readme>
+    <projectUrl>https://github.com/zhaojie-tech/wpf-design-guard</projectUrl>
+    <description>WPF design-system violations at compile time: XAML incremental generator consuming the @(Page)/@(ApplicationDefinition) projection + shared rule engine. Spacing ladder, wrapped-text line height, and more; cold-start safe (stock findings downgrade to warnings, see docs).</description>
+    <releaseNotes>https://github.com/zhaojie-tech/wpf-design-guard/releases</releaseNotes>
+    <tags>wpf;xaml;roslyn;analyzer;source-generator;design-system;lint;dotnet</tags>
+  </metadata>
+  <files>
+    <file src="build/WpfDesignGuard.Analyzers.targets" target="build/" />
+    <file src="buildTransitive/WpfDesignGuard.Analyzers.targets" target="buildTransitive/" />
+    <!-- Concrete-version tier dirs only; Core loads from the same directory.
+         Paths are nuspec-relative (single netstandard2.0 TFM — no matrix). -->
+    <file src="bin/Release/netstandard2.0/WpfDesignGuard.Analyzers.dll" target="analyzers/dotnet/roslyn4.11/cs/" />
+    <file src="bin/Release/netstandard2.0/WpfDesignGuard.Core.dll" target="analyzers/dotnet/roslyn4.11/cs/" />
+    <file src="bin/Release/netstandard2.0/WpfDesignGuard.Analyzers.dll" target="analyzers/dotnet/roslyn4.14/cs/" />
+    <file src="bin/Release/netstandard2.0/WpfDesignGuard.Core.dll" target="analyzers/dotnet/roslyn4.14/cs/" />
+    <file src="docs/README.md" target="docs/" />
+  </files>
+</package>

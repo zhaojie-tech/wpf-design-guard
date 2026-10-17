@@ -1,0 +1,6 @@
+{
+  // Corpus configuration: default tokens; the corpus carries its own expectations
+  // (expected-findings.txt) which the bootstrap tests assert verbatim.
+  "version": 1,
+  "scope": { "include": ["Xaml/**/*.xaml"] }
+}

@@ -1,0 +1,18 @@
+# Corpus expectations — one "RULE FILE COUNT" line per expected (rule, file) hit pair.
+# The bootstrap tests assert the text-engine output against this list verbatim: any
+# engine drift (rule regression or false positive) breaks the corpus, not the docs.
+# DG0012 runs on the symbol layer and is bootstrapped separately by the Analyzers tests.
+DG0001 Xaml/DG0001-positive.xaml 1
+DG0002 Xaml/DG0002-positive.xaml 1
+DG0003 Xaml/DG0003-positive.xaml 1
+DG0005 Xaml/DG0005-positive.xaml 1
+DG0007 Xaml/DG0007-positive.xaml 1
+DG0010 Xaml/DG0010-positive.xaml 1
+DG0015 Xaml/DG0015-positive.xaml 1
+DG0016 Xaml/DG0016-positive.xaml 1
+DG0004 Xaml/DG0004-positive.xaml 1
+DG0006 Xaml/DG0006-positive.xaml 1
+DG0008 Xaml/DG0008-positive.xaml 1
+DG0009 Xaml/DG0009-positive.xaml 1
+DG0011 Xaml/DG0011-positive.xaml 1
+DG0013 Xaml/DG0013-positive.xaml 1

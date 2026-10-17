@@ -1,0 +1,24 @@
+## .NET build artifacts
+bin/
+obj/
+artifacts/
+out/
+*.user
+*.suo
+.vs/
+.idea/
+
+## test / coverage
+TestResults/
+coverage.*
+*.coverage
+*.trx
+liginx/
+
+## packaging
+*.nupkg
+*.snupkg
+.nuget/
+
+## docs build
+site/

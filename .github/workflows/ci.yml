@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  core-analyzers-cli:
+    name: build+test (${{ matrix.dotnet }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dotnet: ['8.0.x', '10.0.x']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+      - name: Restore
+        run: dotnet restore wpf-design-guard.sln
+      - name: Build
+        run: dotnet build wpf-design-guard.sln -c Release --no-restore
+      - name: Test (Core, branch coverage gate ≥ 90%)
+        run: >
+          dotnet test tests/WpfDesignGuard.Core.Tests -c Release --no-build
+          -f net${{ matrix.dotnet == '8.0.x' && '8.0' || '10.0' }}
+          /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+          /p:Threshold=90 /p:ThresholdType=branch /p:ThresholdStat=total
+      - name: Test (Analyzers)
+        run: >
+          dotnet test tests/WpfDesignGuard.Analyzers.Tests -c Release --no-build
+          -f net${{ matrix.dotnet == '8.0.x' && '8.0' || '10.0' }}
+      - name: Test (Cli)
+        run: >
+          dotnet test tests/WpfDesignGuard.Cli.Tests -c Release --no-build
+          -f net${{ matrix.dotnet == '8.0.x' && '8.0' || '10.0' }}
+
+  samples:
+    name: samples corpus (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build corpus project (compile check; fixtures intentionally violate rules)
+        run: dotnet build samples/DesignGuardCorpus -c Release -p:DesignGuardDisableXaml=true
+      - name: Self-bootstrap gate — text engine
+        run: dotnet test tests/WpfDesignGuard.Core.Tests -c Release -f net10.0 --filter Corpus
+      - name: Self-bootstrap gate — DG0012 symbol layer
+        run: dotnet test tests/WpfDesignGuard.Analyzers.Tests -c Release -f net10.0 --filter CorpusSymbol
+
+  performance:
+    name: perf budget (10k synthetic XAML)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify budget (10k synthetic files < 10s)
+        run: dotnet test tests/WpfDesignGuard.PerfTests -c Release -f net10.0 --filter Perf

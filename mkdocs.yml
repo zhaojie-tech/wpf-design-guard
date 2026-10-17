@@ -1,0 +1,19 @@
+site_name: WpfDesignGuard
+site_url: https://zhaojie-tech.github.io/wpf-design-guard/
+site_description: WPF design-system violations at compile time — generator + governance CLI with a dual-layer ratchet gate.
+repo_url: https://github.com/zhaojie-tech/wpf-design-guard
+theme:
+  name: material
+  features: [navigation.sections, content.tabs.link]
+  palette:
+    - scheme: default
+      primary: indigo
+nav:
+  - Home: index.md
+  - Rules: rules/index.md
+  - Guides:
+      - Gradual adoption (cold start): guides/gradual-adoption.md
+      - CI integration: guides/ci-integration.md
+      - Third-party libraries FAQ: guides/third-party-faq.md
+      - Exemption handbook: guides/exemption-handbook.md
+  - Architecture decisions: adr/index.md

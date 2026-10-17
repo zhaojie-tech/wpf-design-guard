@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>WpfDesignGuard.Analyzers</RootNamespace>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- RS2008 (release tracking) deferred until the v0.1.0 shipping baseline exists. -->
+    <NoWarn>$(NoWarn);RS2008</NoWarn>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <Description>WpfDesignGuard compile-time guards: XAML incremental generator + C# analyzers.</Description>
+    <!-- Analyzer assemblies must not carry dependency entries in the nuspec: the SDK loads
+         everything it finds under analyzers/dotnet/<tier>/cs as a closed set. -->
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WpfDesignGuard.Core/WpfDesignGuard.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Handwritten nuspec: analyzer payload goes to concrete-version tier directories
+         (analyzers/dotnet/roslyn4.11|4.14/cs) with Core alongside for same-directory
+         loading — the standard pack item injection cannot express this reliably. -->
+    <NuspecFile>WpfDesignGuard.Analyzers.nuspec</NuspecFile>
+    <NuspecProperties>version=$(Version)</NuspecProperties>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="WpfDesignGuard.Analyzers.Tests" />
+  </ItemGroup>
+
+</Project>

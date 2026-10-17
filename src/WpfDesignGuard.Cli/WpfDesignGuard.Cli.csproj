@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WpfDesignGuard.Cli</RootNamespace>
+    <AssemblyName>designguard</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>designguard</ToolCommandName>
+    <PackageOutputPath>../../artifacts/nupkg</PackageOutputPath>
+    <RollForward>Major</RollForward>
+    <Description>WpfDesignGuard governance CLI: dual-layer ratchet gate (hard-zero domains + global baseline), SARIF reporting, span-level fixes.</Description>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="WpfDesignGuard.Cli.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WpfDesignGuard.Core/WpfDesignGuard.Core.csproj" />
+  </ItemGroup>
+
+</Project>

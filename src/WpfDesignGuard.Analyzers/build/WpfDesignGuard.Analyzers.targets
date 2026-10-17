@@ -1,0 +1,55 @@
+<Project>
+
+  <!--
+    WpfDesignGuard consumer targets.
+    Injects the compiled XAML surface as AdditionalFiles so XamlDesignGenerator sees
+    exactly what the XAML compiler sees: @(Page) + @(ApplicationDefinition)
+    projection — no file-system globbing, no bin/obj noise, no double registration.
+    Also injects designguard.json so the generator reads the same configuration the CLI does.
+    Shipped under build/ and buildTransitive/ (transitive references only honor the latter).
+  -->
+
+  <PropertyGroup>
+    <DesignGuardDisableXaml Condition="'$(DesignGuardDisableXaml)' == ''">false</DesignGuardDisableXaml>
+    <DesignGuardConfigFile Condition="'$(DesignGuardConfigFile)' == ''">designguard.json</DesignGuardConfigFile>
+  </PropertyGroup>
+
+  <Target Name="DesignGuardInjectAdditionalFiles"
+          BeforeTargets="CoreCompile"
+          Condition="'$(DesignGuardDisableXaml)' != 'true'">
+    <!-- FullPath projection: MSBuild hands AdditionalFiles to the compiler relative to the
+         build working directory (not the project), which would break the generator's
+         scope-root-relative path math and the baseline per-file snapshot lookup. Absolute
+         paths make the generator's relativization deterministic. -->
+    <ItemGroup>
+      <_DesignGuardXamlFiles Include="@(Page)"/>
+      <_DesignGuardXamlFiles Include="@(ApplicationDefinition)"/>
+      <AdditionalFiles Include="@(_DesignGuardXamlFiles->'%(FullPath)')"/>
+      <AdditionalFiles Include="$([System.IO.Path]::GetFullPath('$(DesignGuardConfigFile)'))" Condition="Exists('$(DesignGuardConfigFile)')"/>
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Projection emission for the CLI cross-check mode of designguard verify:
+    writes the generator-facing file list so the CLI can report the exact
+    generator-vs-scope file-set delta.
+  -->
+  <Target Name="DesignGuardEmitProjection"
+          Condition="'$(DesignGuardProjectionFile)' != '' and '$(DesignGuardDisableXaml)' != 'true'">
+    <ItemGroup>
+      <_DesignGuardProjection Include="@(Page)"/>
+      <_DesignGuardProjection Include="@(ApplicationDefinition)"/>
+    </ItemGroup>
+    <WriteLinesToFile File="$(DesignGuardProjectionFile)"
+                      Lines="@(_DesignGuardProjection->'%(FullPath)')"
+                      Overwrite="true"
+                      Encoding="UTF-8"
+                      Condition="'@(_DesignGuardProjection)' != ''"/>
+    <WriteLinesToFile File="$(DesignGuardProjectionFile)"
+                      Lines=""
+                      Overwrite="true"
+                      Encoding="UTF-8"
+                      Condition="'@(_DesignGuardProjection)' == ''"/>
+  </Target>
+
+</Project>

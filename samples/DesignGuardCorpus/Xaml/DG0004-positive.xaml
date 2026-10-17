@@ -1,0 +1,1 @@
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><StackPanel Orientation="Horizontal"><TextBox Padding="{DynamicResource Spacing.Md}"/></StackPanel></Page>

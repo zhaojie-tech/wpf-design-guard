@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zhaojie-tech.github.io/wpf-design-guard/schema/v1/designguard.schema.json",
+  "title": "WpfDesignGuard configuration",
+  "description": "Single source of truth for the WpfDesignGuard compile-time guard: scan scope, rule switches, token table, exemption ledger, hard-zero domains and the ratchet baseline.",
+  "type": "object",
+  "required": ["version"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Configuration format version. Only 1 is understood."
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "root": {
+          "type": "string",
+          "description": "Base directory (relative to the project) that exemption and baseline paths resolve against.",
+          "default": "."
+        },
+        "include": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Glob patterns (repo-relative, '/' separators) of the scanned surface. An empty list is a configuration error (anti-idle self-check)."
+        },
+        "exclude": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "perRule": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "include": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Replaces the global include for this rule."
+              },
+              "exclude": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Adds to the global exclude for this rule."
+              }
+            }
+          },
+          "description": "Per-rule scan-surface overrides. Keys are rule IDs (DGxxxx)."
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "severity": { "enum": ["error", "warning", "info"] },
+          "enabled": { "type": "boolean", "default": true }
+        }
+      },
+      "description": "Unlisted rules are enabled with their catalog default severity."
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "spacingLadder": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "uniqueItems": true,
+          "minItems": 1,
+          "description": "Strictly ascending ladder of spacing values; any Margin/Padding component off this ladder is DG0002."
+        },
+        "fontSizes": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "required": ["Body"],
+          "description": "Named font-size tokens. A 'Body' entry is required and must be >= 16 (legibility floor)."
+        },
+        "hitTargetFloor": {
+          "type": "number",
+          "minimum": 44,
+          "default": 48,
+          "description": "Touch hit-target floor. Values below 44 are a configuration error."
+        },
+        "uniformSpacingKeys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Glob key families treated as uniform spacing tokens (DG0004 judgement data).",
+          "default": ["Spacing.*"]
+        },
+        "lineHeights": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "Font-size key to line-height mapping; data source of the DG0007 fix."
+        },
+        "clickableTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Clickable control type list (DG0008/0009/0017 judgement data)."
+        },
+        "inlineInputTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Inline input element types (DG0004/0016 judgement data)."
+        },
+        "styleLibrary": {
+          "type": "string",
+          "description": "Style library definition file glob (DG0017 coverage gate)."
+        }
+      }
+    },
+    "hardZero": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string", "pattern": "^DG[0-9]{4}$" }
+      },
+      "description": "File glob -> rule IDs. Hits inside a domain are always red regardless of the baseline; baseline --update never relaxes them, and exemptions pointing into a domain are a configuration error."
+    },
+    "exemptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule", "file", "count", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "rule": { "type": "string", "pattern": "^DG[0-9]{4}$" },
+          "file": { "type": "string", "description": "Path relative to scope.root; directory-level exemptions are forbidden." },
+          "count": { "type": "integer", "minimum": 1, "description": "Registered occurrence count; a mismatch with actual hits is a stale exemption (red)." },
+          "reason": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "description": "Optional type-scoped exemption for coverage gates (DG0017)." }
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "date": { "type": "string", "description": "ISO date the baseline was last (re)written." },
+        "counts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 },
+          "description": "Global per-rule ratchet counters; absent rules are 0 (any hit is red)."
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": { "type": "integer", "minimum": 0 }
+          },
+          "description": "Per-file snapshots (written by init). Data source of the cold-start downgrade: hits within the snapshot compile as warnings, others as errors."
+        }
+      }
+    }
+  }
+}

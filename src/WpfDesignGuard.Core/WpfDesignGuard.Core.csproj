@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>WpfDesignGuard.Core</RootNamespace>
+    <!-- Single source of truth for rule evaluation: shared verbatim by the generator and the CLI. -->
+    <Description>WpfDesignGuard rule engine: XAML model parsing, designguard.json model, exemption ledger, hard-zero domains and ratchet baseline.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Xml.XDocument" />
+  </ItemGroup>
+
+</Project>
