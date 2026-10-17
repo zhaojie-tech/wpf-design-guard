@@ -1,7 +1,7 @@
 name: release
 
-# Tag-triggered release: full test gate → NuGet trusted publishing (all three packages,
-# same version train) → GitHub Release with generated notes.
+# Tag-triggered release: test gate -> pack the three packages -> NuGet publish
+# (when a key is configured) -> GitHub Release with generated notes.
 on:
   push:
     tags: ['v*']
@@ -12,26 +12,32 @@ permissions:
 jobs:
   test-gate:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        dotnet: ['8.0.x', '10.0.x']
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet }}
-      - run: dotnet test wpf-design-guard.sln -c Release
+          dotnet-version: '10.0.x'
+      - name: Core tests (branch coverage gate)
+        run: >
+          dotnet test tests/WpfDesignGuard.Core.Tests -c Release -f net10.0
+          /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+          /p:Threshold=90 /p:ThresholdType=branch /p:ThresholdStat=total
+      - name: Analyzer tests
+        run: dotnet test tests/WpfDesignGuard.Analyzers.Tests -c Release -f net10.0
+      - name: CLI tests
+        run: dotnet test tests/WpfDesignGuard.Cli.Tests -c Release -f net10.0
 
   pack-and-publish:
     needs: test-gate
     runs-on: ubuntu-latest
-    # NuGet publishing account is an external prerequisite confirmed by the maintainer;
-    # trusted publishing requires a configured NuGetApiKey-less OIDC trust on nuget.org.
     permissions:
       contents: write
       id-token: write
     environment: nuget
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -41,13 +47,15 @@ jobs:
         run: >
           dotnet pack wpf-design-guard.sln -c Release
           -p:PackageOutputPath=${{ github.workspace }}/artifacts/nupkg
+      - name: Note when NuGet publishing is not configured
+        if: env.NUGET_API_KEY == ''
+        run: echo "::notice::NUGET_API_KEY is not configured — skipping nuget.org publish; packages are attached to the GitHub Release."
       - name: Publish to nuget.org
+        if: env.NUGET_API_KEY != ''
         run: >
           dotnet nuget push "artifacts/nupkg/*.nupkg"
+          --api-key "$NUGET_API_KEY"
           --source https://api.nuget.org/v3/index.json --skip-duplicate
-        env:
-          # Trusted publishing via nuget/login@v1 once the NuGet account prerequisite is confirmed.
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       - name: GitHub Release with generated notes
         uses: softprops/action-gh-release@v2
         with:
